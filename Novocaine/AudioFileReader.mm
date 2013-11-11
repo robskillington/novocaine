@@ -273,7 +273,10 @@
     // Release the dispatch timer because it holds a reference to this class instance
     [self pause];
     if (self.callbackTimer) {
-        dispatch_release(self.callbackTimer);
+        // robskillington 2013-Nov-11: using directly under ARC, setting to nil will release the handle
+        // dispatch_release(self.callbackTimer);
+        self.callbackTimer = nil;
+
     }
 }
 
