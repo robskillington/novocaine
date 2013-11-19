@@ -115,8 +115,14 @@ static Novocaine *audioManager = nil;
 
 - (id)init
 {
+    return [self initWithDelegate:nil];
+}
+
+- (id)initWithDelegate:(id<NovocaineDelegate>)delegate
+{
 	if (self = [super init])
 	{
+        self.delegate = delegate;
         
         // Initialize a float buffer to hold audio
 		self.inData  = (float *)calloc(8192, sizeof(float)); // probably more than we'll need
@@ -134,6 +140,11 @@ static Novocaine *audioManager = nil;
 		
 		// Fire up the audio session ( with steady error checking ... )
         [self setupAudioSession];
+        
+        // Allow custom setup
+        if ([self.delegate respondsToSelector:@selector(setupAudioSession)]) {
+            [self.delegate setupAudioSession];
+        }
         
         // start audio units
         [self setupAudioUnits];
@@ -357,8 +368,8 @@ static Novocaine *audioManager = nil;
                "Couldn't get the hardware output stream format");
     
     // TODO: check this works on iOS!
-    _inputFormat.mSampleRate = 44100.0;
-    _outputFormat.mSampleRate = 44100.0;
+//    _inputFormat.mSampleRate = 44100.0;
+//    _outputFormat.mSampleRate = 44100.0;
     self.samplingRate = _inputFormat.mSampleRate;
     self.numBytesPerSample = _inputFormat.mBitsPerChannel / 8;
     
@@ -906,6 +917,11 @@ void sessionPropertyListener(void *                  inClientData,
     CheckError( AudioSessionGetProperty(kAudioSessionProperty_CurrentHardwareSampleRate, &size, &currentSamplingRate), "Checking hardware sampling rate");
     self.samplingRate = currentSamplingRate;
     NSLog(@"Current sampling rate: %f", self.samplingRate);
+
+    NSInteger currentNumInputChannels = [[AVAudioSession sharedInstance] inputNumberOfChannels];
+    NSInteger currentNumOutputChannels = [[AVAudioSession sharedInstance] outputNumberOfChannels];
+    NSLog(@"Current input channels: %d", currentNumInputChannels);
+    NSLog(@"Current output channels: %d", currentNumOutputChannels);
 	
 }
 

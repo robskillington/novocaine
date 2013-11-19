@@ -93,6 +93,14 @@ void sessionInterruptionListener(void *inClientData, UInt32 inInterruption);
 typedef void (^NovocaineOutputBlock)(float *data, UInt32 numFrames, UInt32 numChannels);
 typedef void (^NovocaineInputBlock)(float *data, UInt32 numFrames, UInt32 numChannels);
 
+@protocol NovocaineDelegate <NSObject>
+
+@optional
+
+- (void)setupAudioSession;
+
+@end
+
 #if defined (USING_IOS)
 @interface Novocaine : NSObject <UIAlertViewDelegate>
 #elif defined (USING_OSX)
@@ -102,6 +110,7 @@ typedef void (^NovocaineInputBlock)(float *data, UInt32 numFrames, UInt32 numCha
 // ------ These properties/methods are used for configuration -------
 
 @property (nonatomic, copy)     NSString *inputRoute;
+@property (nonatomic, weak)     id<NovocaineDelegate> delegate;
 
 // TODO: Not yet implemented. No effect right now.
 //@property (nonatomic, assign)   BOOL inputEnabled;
@@ -141,6 +150,7 @@ typedef void (^NovocaineInputBlock)(float *data, UInt32 numFrames, UInt32 numCha
 + (Novocaine *) audioManager;
 
 // Audio Unit methods
+- (id)initWithDelegate:(id<NovocaineDelegate>)delegate;
 - (void)play;
 - (void)pause;
 
