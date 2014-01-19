@@ -35,6 +35,7 @@
 
 
 #import "Novocaine.h"
+#import <CoreAudio/CoreAudioTypes.h>
 #define kInputBus 1
 #define kOutputBus 0
 #define kDefaultDevice 999999
